@@ -1,5 +1,5 @@
 import torch.nn as nn
-from network import swish, CondResBlock, Downsample, Self_Attn
+from models.network import swish, CondResBlock, Downsample, Self_Attn
 import torch
 import torch.nn.functional as F
 

@@ -1,5 +1,5 @@
 import torch.nn as nn
-from network import swish, CondResBlock
+from models.network import swish, CondResBlock
 
 class MNISTModel(nn.Module):
     def __init__(self, args):
