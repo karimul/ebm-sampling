@@ -87,8 +87,8 @@ def main():
 
     for key in dir(FLAGS):
         flags_dict[key] = getattr(FLAGS, key)
-    flags['cpu'] = torch.device("cpu")
-    flags['gpu'] = torch.device("cuda")
+    flags_dict['cpu'] = torch.device("cpu")
+    flags_dict['gpu'] = torch.device("cuda")
     main_single(flags_dict)
 
 if __name__ == "__main__":
