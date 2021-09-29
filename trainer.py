@@ -26,6 +26,9 @@ from models.resnet_model import ResNetModel
 from torch.utils.data import DataLoader
 from torch.optim import Adam
 
+from azureml.core import Run
+run = Run.get_context()
+
 def compress_x_mod(x_mod):
     x_mod = (255 * np.clip(x_mod, 0, 1)).astype(np.uint8)
     return x_mod
@@ -36,7 +39,8 @@ def decompress_x_mod(x_mod):
         np.random.uniform(0, 1 / 256, x_mod.shape)
     return x_mod
 
-def log_tensorboard(writer, data):  
+def log_tensorboard(writer, data): 
+    run.log('IS', data["is_mean"])  
     writer.add_scalar("replay buffer length", data["length_replay_buffer"], data["iter"])
     writer.add_scalar("repel loss", data["loss_repel"], data["iter"])
     writer.add_scalar("batch loss", data["loss"], data["iter"])
@@ -349,7 +353,7 @@ def train(model, optimizer, dataloader,logdir, resume_iter, FLAGS, best_inceptio
                 if FLAGS.replay_batch:
                     kvs['length_replay_buffer'] = len(replay_buffer)
 
-                log_tensorboard(kvs)
+                log_tensorboard(writer, kvs)
                 tock = tick
 
             if itr % FLAGS.save_interval == 0 and (FLAGS.save_interval != 0):

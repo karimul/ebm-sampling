@@ -91,7 +91,7 @@ def main():
     for key in dir(FLAGS):
         flags_dict[key] = getattr(FLAGS, key)
 
-    main_single(0, flags_dict)
+    main_single(flags_dict)
 
 if __name__ == "__main__":
     main()
