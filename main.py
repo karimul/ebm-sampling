@@ -1,6 +1,7 @@
 from easydict import EasyDict
 from tensorflow.python.platform import flags
 from trainer import main_single
+import torch
 
 FLAGS = flags.FLAGS
 
@@ -13,10 +14,10 @@ flags.DEFINE_integer('node_rank', 0,
     'rank of node')
 
 # Configurations for distributed training
-flags.DEFINE_string('master_addr', '8.8.8.8',
-    'address of communicating server')
-flags.DEFINE_string('port', '10002',
-    'port of training')
+flags.DEFINE_string('cpu', torch.device("cpu"),
+    'cpu')
+flags.DEFINE_string('gpu', torch.device("cuda"),
+    'gpu')
 flags.DEFINE_bool('slurm', False,
     'whether we are on slurm')
 flags.DEFINE_bool('repel_im', True,
