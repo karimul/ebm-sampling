@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import numpy as np
 import torch
-from torchvision.datasets import CelebA
+import torchvision
 
 class CelebADataset(Dataset):
     def __init__(
@@ -32,7 +32,7 @@ class CelebADataset(Dataset):
                 transforms.ToTensor()
             ])
 
-        self.data = CelebA(
+        self.data = torchvision.datasets.CelebA(
             "./data/celeba",
             transform=transform,
             split=split,

@@ -1,12 +1,12 @@
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import numpy as np
-from torchvision.datasets import MNIST
+import torchvision
 import torch
 
 class Mnist(Dataset):
     def __init__(self, train=True, rescale=1.0):
-        self.data = MNIST(
+        self.data = torchvision.datasets.MNIST(
             "data/mnist",
             transform=transforms.ToTensor(),
             download=True, train=train)

@@ -2,7 +2,7 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import numpy as np
 import torch
-from torchvision.datasets import CIFAR10
+import torchvision
 
 class Cifar10(Dataset):
     def __init__(
@@ -26,12 +26,12 @@ class Cifar10(Dataset):
             transform = transforms.ToTensor()
 
         self.full = full
-        self.data = CIFAR10(
+        self.data = torchvision.datasets.CIFAR10(
             "./data/cifar10",
             transform=transform,
             train=train,
             download=True)
-        self.test_data = CIFAR10(
+        self.test_data = torchvision.datasets.CIFAR10(
             "./data/cifar10",
             transform=transform,
             train=False,
