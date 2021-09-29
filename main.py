@@ -14,10 +14,6 @@ flags.DEFINE_integer('node_rank', 0,
     'rank of node')
 
 # Configurations for distributed training
-flags.DEFINE_string('cpu', torch.device("cpu"),
-    'cpu')
-flags.DEFINE_string('gpu', torch.device("cuda"),
-    'gpu')
 flags.DEFINE_bool('slurm', False,
     'whether we are on slurm')
 flags.DEFINE_bool('repel_im', True,
@@ -47,7 +43,7 @@ flags.DEFINE_string('logdir', 'cachedir',
     'location where log of experiments will be stored')
 flags.DEFINE_string('exp', 'default', 'name of experiments')
 flags.DEFINE_string('entropy', 'kl', 'entropy regularization')
-flags.DEFINE_integer('log_interval', 10, 'log outputs every so many batches')
+flags.DEFINE_integer('log_interval', 100, 'log outputs every so many batches')
 flags.DEFINE_integer('save_interval', 1000,'save outputs every so many batches')
 flags.DEFINE_integer('test_interval', 1000,'evaluate outputs every so many batches')
 flags.DEFINE_integer('resume_iter', 0, 'iteration to resume training from')
@@ -55,7 +51,7 @@ flags.DEFINE_bool('train', True, 'whether to train or test')
 flags.DEFINE_bool('transform', True, 'apply data augmentation when sampling from the replay buffer')
 flags.DEFINE_bool('kl', True, 'apply a KL term to loss')
 flags.DEFINE_bool('cuda', True, 'move device on cuda')
-flags.DEFINE_integer('epoch_num', 10000, 'Number of Epochs to train on')
+flags.DEFINE_integer('epoch_num', 10, 'Number of Epochs to train on')
 flags.DEFINE_integer('ensembles', 1, 'Number of ensembles to train models with')
 flags.DEFINE_float('lr', 2e-4, 'Learning for training')
 flags.DEFINE_float('kl_coeff', 1.0, 'coefficient for kl')
@@ -91,7 +87,8 @@ def main():
 
     for key in dir(FLAGS):
         flags_dict[key] = getattr(FLAGS, key)
-
+    flags['cpu'] = torch.device("cpu")
+    flags['gpu'] = torch.device("cuda")
     main_single(flags_dict)
 
 if __name__ == "__main__":
