@@ -41,13 +41,18 @@ def decompress_x_mod(x_mod):
         np.random.uniform(0, 1 / 256, x_mod.shape)
     return x_mod
 
-def log_tensorboard(writer, data): 
+def log_tensorboard(writer, data):
+    fig, ax = plt.subplots(figsize=(12, 12))
+    ax.set_xticks([]); ax.set_yticks([])
+    ax.imshow(make_grid(data["negative_samples"], nrow=8).permute(1, 2, 0)) 
+
+    img_name = "negative_examples_" +  str(data["iter"])
+    run.log_image(name=img_name, plot=ax)
+
     run.log_row("IS", x=data["iter"], y=data["is_mean"])
     run.log_row("FID", x=data["iter"], y=data["fid"])
     run.log_row("energy different", x=data["iter"], y=data["e_diff"])
-    plt.imshow(make_grid(data["negative_samples"][:128], nrow=8).permute(1, 2, 0), interpolation='nearest')
-    img_name = "negative_examples_" +  str(data["iter"])
-    run.log_image(name=img_name, plot=plt)
+
     writer.add_scalar("replay buffer length", data["length_replay_buffer"], )
     writer.add_scalar("repel loss", data["loss_repel"], data["iter"])
     writer.add_scalar("batch loss", data["loss"], data["iter"])
