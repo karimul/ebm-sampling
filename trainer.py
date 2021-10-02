@@ -25,7 +25,7 @@ from models.mnist_model import MNISTModel
 from models.resnet_model import ResNetModel
 from torch.utils.data import DataLoader
 from torch.optim import Adam
-
+import matplotlib.pyplot as plt
 from azureml.core import Run
 run = Run.get_context()
 
@@ -40,8 +40,13 @@ def decompress_x_mod(x_mod):
     return x_mod
 
 def log_tensorboard(writer, data): 
-    run.log('IS', data["is_mean"])  
-    writer.add_scalar("replay buffer length", data["length_replay_buffer"], data["iter"])
+    run.log_row("IS", x=data["iter"], y=data["is_mean"])
+    run.log_row("FID", x=data["iter"], y=data["fid"])
+    run.log_row("energy different", x=data["iter"], y=data["e_diff"])
+    plt.imshow(data["negative_samples"], interpolation='nearest')
+    img_name = "negative_examples_" +  str(data["iter"])
+    run.log_image(name=img_name, plot=plt)
+    writer.add_scalar("replay buffer length", data["length_replay_buffer"], )
     writer.add_scalar("repel loss", data["loss_repel"], data["iter"])
     writer.add_scalar("batch loss", data["loss"], data["iter"])
     writer.add_scalar("average loss", data["avg_loss"], data["iter"])
@@ -64,8 +69,8 @@ def log_tensorboard(writer, data):
     writer.add_images("positive examples", data["positive_samples"], data["iter"])
     writer.add_images("negative examples", data["negative_samples"], data["iter"])
 
-def train(model, optimizer, dataloader,logdir, resume_iter, FLAGS, best_inception):
-    writer = SummaryWriter(comment="_{sampler}_{entropy}_{dataset}_{step_lr}_{noise_scale}".format(dataset=FLAGS.dataset, entropy=FLAGS.entropy, sampler=FLAGS.sampler, step_lr=FLAGS.step_lr, noise_scale=FLAGS.noise_scale))
+def train(model, optimizer, dataloader, FLAGS):
+    writer = SummaryWriter(log_dir=FLAGS.logdir)
     inception = IS().to(FLAGS.gpu, non_blocking=True)
     fid = FID(feature=2048).to(FLAGS.gpu, non_blocking=True)
 
@@ -75,7 +80,7 @@ def train(model, optimizer, dataloader,logdir, resume_iter, FLAGS, best_inceptio
         else:
             replay_buffer = ReplayBuffer(FLAGS.buffer_size, FLAGS.transform, FLAGS.dataset)
     dist_sinkhorn = SamplesLoss('sinkhorn')
-    itr = resume_iter
+    itr = FLAGS.resume_iter
     im_neg = None
     gd_steps = 1
 
@@ -357,9 +362,9 @@ def train(model, optimizer, dataloader,logdir, resume_iter, FLAGS, best_inceptio
                 tock = tick
 
             if itr % FLAGS.save_interval == 0 and (FLAGS.save_interval != 0):
-                model_path = osp.join(logdir, "model_{}.pth".format(itr))
+                model_path = osp.join(FLAGS.logdir, "model_{}.pth".format(itr))
                 ckpt = {'optimizer_state_dict': optimizer.state_dict(),
-                            'FLAGS': FLAGS, 'best_inception': best_inception}
+                            'FLAGS': FLAGS}
 
                 for i in range(FLAGS.ensembles):
                     ckpt['model_state_dict_{}'.format(i)] = model.state_dict()
@@ -372,10 +377,6 @@ def train(model, optimizer, dataloader,logdir, resume_iter, FLAGS, best_inceptio
             
 def main_single(FLAGS):
     print("Values of args: ", FLAGS)
-    ROOT = "./result"
-    sample_dir = os.path.join(ROOT, 'icd.v6')
-    if not os.path.exists(sample_dir):
-        os.makedirs(sample_dir)
 
     if FLAGS.dataset == "cifar10":
         train_dataset = Cifar10(FLAGS)
@@ -395,16 +396,11 @@ def main_single(FLAGS):
     train_dataloader = DataLoader(train_dataset, num_workers=FLAGS.data_workers, batch_size=FLAGS.batch_size, shuffle=True, drop_last=True)
     # valid_dataloader = DataLoader(valid_dataset, num_workers=FLAGS.data_workers, batch_size=FLAGS.batch_size, shuffle=True, drop_last=True)
     # test_dataloader = DataLoader(test_dataset, num_workers=FLAGS.data_workers, batch_size=FLAGS.batch_size, shuffle=True, drop_last=True)
-
-    logdir = osp.join(sample_dir, FLAGS.exp, FLAGS.dataset)
-
-    best_inception = 0.0
     
     if FLAGS.resume_iter != 0:
         FLAGS_OLD = FLAGS
-        model_path = osp.join(logdir, "model_{}.pth".format(FLAGS.resume_iter))
+        model_path = osp.join(FLAGS.logdir, "model_{}.pth".format(FLAGS.resume_iter))
         checkpoint = torch.load(model_path)
-        best_inception = checkpoint['best_inception']
         FLAGS = checkpoint['FLAGS']
 
         FLAGS.resume_iter = FLAGS_OLD.resume_iter
@@ -431,13 +427,13 @@ def main_single(FLAGS):
 
     it = FLAGS.resume_iter
 
-    if not osp.exists(logdir):
-        os.makedirs(logdir)
+    if not osp.exists(FLAGS.logdir):
+        os.makedirs(FLAGS.logdir)
 
     checkpoint = None
     if FLAGS.resume_iter != 0:
         print("FLAGS.resume_iter:",FLAGS.resume_iter)
-        model_path = osp.join(logdir, "model_{}.pth".format(FLAGS.resume_iter))
+        model_path = osp.join(FLAGS.logdir, "model_{}.pth".format(FLAGS.resume_iter))
         checkpoint = torch.load(model_path)
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
@@ -451,4 +447,4 @@ def main_single(FLAGS):
     pytorch_total_params = sum([p.numel() for p in model.parameters() if p.requires_grad])
     print("Number of parameters for models", pytorch_total_params)
 
-    train(model, optimizer, train_dataloader, logdir, FLAGS.resume_iter, FLAGS, best_inception)
+    train(model, optimizer, train_dataloader, FLAGS)
