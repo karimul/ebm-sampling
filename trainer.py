@@ -326,11 +326,11 @@ def train(model, optimizer, dataloader, FLAGS):
                 # kvs['hmc_loss'] = hmc_loss.item()
                 kvs['num_steps'] = num_steps
                 # kvs['t_diff'] = tick - tock
-                kvs['positive_samples'] = data.detach()
-                kvs['negative_samples'] = im_neg.detach()
+                kvs['positive_samples'] = data.cpu().detach()
+                kvs['negative_samples'] = im_neg.cpu().detach()
 
-                real = data.detach().cpu()
-                fake = im_neg.detach().cpu()
+                real = data.cpu().detach()
+                fake = im_neg.cpu().detach()
                 data = None
                 im_neg = None
                 if real.shape[1] == 1:
