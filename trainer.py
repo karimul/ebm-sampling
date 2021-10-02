@@ -27,6 +27,8 @@ from torch.utils.data import DataLoader
 from torch.optim import Adam
 import matplotlib.pyplot as plt
 from azureml.core import Run
+from torchvision.utils import make_grid
+
 run = Run.get_context()
 
 def compress_x_mod(x_mod):
@@ -43,7 +45,7 @@ def log_tensorboard(writer, data):
     run.log_row("IS", x=data["iter"], y=data["is_mean"])
     run.log_row("FID", x=data["iter"], y=data["fid"])
     run.log_row("energy different", x=data["iter"], y=data["e_diff"])
-    plt.imshow(data["negative_samples"], interpolation='nearest')
+    plt.imshow(make_grid(data["negative_samples"][:128], nrow=8).permute(1, 2, 0), interpolation='nearest')
     img_name = "negative_examples_" +  str(data["iter"])
     run.log_image(name=img_name, plot=plt)
     writer.add_scalar("replay buffer length", data["length_replay_buffer"], )
