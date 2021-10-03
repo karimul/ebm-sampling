@@ -42,11 +42,14 @@ def decompress_x_mod(x_mod):
     return x_mod
 
 def log_tensorboard(writer, data):
-    img_grid = make_grid(data["negative_samples"], nrow=8).permute(1, 2, 0)
-    plt.imshow(img_grid) 
+    fig, ax = plt.subplots(figsize=(12, 12))
+    ax.set_xticks([]); ax.set_yticks([])
+    ax.imshow(make_grid(data["negative_samples"][:64], nrow=8).permute(1, 2, 0))
+    # img_grid = make_grid(data["negative_samples"], nrow=8).permute(1, 2, 0)
+    # plt.imshow(img_grid) 
 
     img_name = "negative_examples_" +  str(data["iter"])
-    run.log_image(name=img_name, plot=plt)
+    run.log_image(name=img_name, plot=fig)
 
     run.log_row("IS", x=data["iter"], y=data["is_mean"])
     run.log_row("FID", x=data["iter"], y=data["fid"])
