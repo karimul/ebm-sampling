@@ -71,7 +71,6 @@ flags.DEFINE_float('noise_scale', .23,'Relative amount of noise for MCMC')
 flags.DEFINE_float('init_noise', .1,'Relative amount of noise for MCMC')
 flags.DEFINE_float('momentum', 0.9,'Relative amount of noise for MCMC')
 flags.DEFINE_float('eps', 1e-6,'Relative amount of noise for MCMC')
-flags.DEFINE_float('step_size', 10,'Relative amount of noise for MCMC')
 
 # Architecture Settings
 flags.DEFINE_integer('filter_dim', 64, 'number of filters for conv nets')
