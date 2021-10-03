@@ -36,7 +36,7 @@ class CelebADataset(Dataset):
             FLAGS.datadir,
             transform=transform,
             split=split,
-            download=True)
+            download=FLAGS.download)
         self.one_hot_map = np.eye(10)
         self.noise = noise
         self.rescale = rescale

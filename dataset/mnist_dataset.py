@@ -9,7 +9,7 @@ class Mnist(Dataset):
         self.data = torchvision.datasets.MNIST(
             FLAGS.datadir,
             transform=transforms.ToTensor(),
-            download=True, train=train)
+            download=FLAGS.download, train=train)
         self.labels = np.eye(10)
 
     def __len__(self):
