@@ -424,7 +424,7 @@ def main_single(FLAGS):
     model = model_fn(FLAGS).train()
     # models_ema = model_fn(FLAGS).train()
 
-    if FLAGS.cuda:
+    if torch.cuda.is_available():
         model = model.to(FLAGS.gpu)
 
     optimizer = Adam(model.parameters(), lr=FLAGS.lr, betas=(0.0, 0.9), eps=1e-8)
