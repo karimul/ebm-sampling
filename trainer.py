@@ -393,7 +393,7 @@ def main_single(FLAGS):
         # valid_dataset = CelebADataset(FLAGS, train=False, augment=False)
         # test_dataset = CelebADataset(FLAGS, train=False, augment=False)
     elif FLAGS.dataset == "mnist":
-        train_dataset = Mnist(train=True)
+        train_dataset = Mnist(FLAGS)
         # valid_dataset = Mnist(train=False)
         # test_dataset = Mnist(train=False)
     else:

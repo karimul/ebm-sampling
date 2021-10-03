@@ -5,9 +5,9 @@ import torchvision
 import torch
 
 class Mnist(Dataset):
-    def __init__(self, train=True, rescale=1.0):
+    def __init__(self, FLAGS, train=True, rescale=1.0):
         self.data = torchvision.datasets.MNIST(
-            "data/mnist",
+            FLAGS.datadir,
             transform=transforms.ToTensor(),
             download=True, train=train)
         self.labels = np.eye(10)

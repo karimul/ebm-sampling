@@ -33,7 +33,7 @@ class CelebADataset(Dataset):
             ])
 
         self.data = torchvision.datasets.CelebA(
-            "./data/celeba",
+            FLAGS.datadir,
             transform=transform,
             split=split,
             download=True)

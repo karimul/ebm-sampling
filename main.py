@@ -41,6 +41,8 @@ flags.DEFINE_integer('buffer_size', 10000, 'Size of inputs')
 # General Experiment Settings
 flags.DEFINE_string('logdir', 'cachedir',
     'location where log of experiments will be stored')
+flags.DEFINE_string('datadir', './data',
+    'location where dataset will be stored')
 flags.DEFINE_string('exp', 'default', 'name of experiments')
 flags.DEFINE_string('entropy', 'kl', 'entropy regularization')
 flags.DEFINE_integer('log_interval', 100, 'log outputs every so many batches')

@@ -27,15 +27,15 @@ class Cifar10(Dataset):
 
         self.full = full
         self.data = torchvision.datasets.CIFAR10(
-            "./data/cifar10",
+            FLAGS.datadir,
             transform=transform,
             train=train,
-            download=True)
+            download=False)
         self.test_data = torchvision.datasets.CIFAR10(
-            "./data/cifar10",
+            FLAGS.datadir,
             transform=transform,
             train=False,
-            download=True)
+            download=False)
         self.one_hot_map = np.eye(10)
         self.noise = noise
         self.rescale = rescale
